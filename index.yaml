@@ -3,6 +3,16 @@ entries:
   code-server-oauth-proxy:
   - apiVersion: v2
     appVersion: 4.1.0
+    created: "2022-03-07T13:53:18.858233138Z"
+    description: A Helm chart for linuxserver/code-server
+    digest: 7fdadaea1e2c97a3275780f0f44f9fb804a59da4048488d07982ae4c539c0c2d
+    name: code-server-oauth-proxy
+    type: application
+    urls:
+    - https://github.com/jjaniec/charts/releases/download/code-server-oauth-proxy-1.0.0/code-server-oauth-proxy-1.0.0.tgz
+    version: 1.0.0
+  - apiVersion: v2
+    appVersion: 4.1.0
     created: "2022-03-07T13:37:52.588606302Z"
     description: A Helm chart for linuxserver/code-server
     digest: a873040fc4931a050652546c70b81b47b565ae32b227fb592e5c545389cffc09
@@ -11,4 +21,4 @@ entries:
     urls:
     - https://github.com/jjaniec/charts/releases/download/code-server-oauth-proxy-0.1.0/code-server-oauth-proxy-0.1.0.tgz
     version: 0.1.0
-generated: "2022-03-07T13:37:52.588610402Z"
+generated: "2022-03-07T13:53:18.858240838Z"
