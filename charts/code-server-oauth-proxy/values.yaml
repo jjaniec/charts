@@ -1,0 +1,225 @@
+# Default values for code-server.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+vscodeExtensionsIds: "vscode-icons-team.vscode-icons|editorconfig.editorconfig|hashicorp.terraform"
+dockerMods: "linuxserver/mods:code-server-extension-arguments|linuxserver/mods:code-server-zsh"
+sudoPassword: "root"
+
+domainNameSuffix: kubeapps.domain
+
+replicaCount: 1
+
+oauthProxy:
+  enabled: true
+
+  additionalAllowedEmails: []
+
+  proxyClientId: ""
+  proxyClientSecret: ""
+  proxyCookieSecret: ""
+  proxyOIDCIssuerUrl: ""
+
+  image:
+    repository: docker.io/bitnami/oauth2-proxy
+    tag: '7.2.1-debian-10-r49'
+
+  resources:
+    limits:
+      cpu: 250m
+      memory: 128Mi
+    requests:
+      cpu: 25m
+      memory: 32Mi
+
+  securityContext: {}
+
+  service:
+    port: 3000
+
+  containerPort: 3000
+
+image:
+  repository: linuxserver/code-server
+  # repository: codercom/code-server
+  tag: '4.1.0'
+  pullPolicy: Always
+
+readinessProbe:
+  initialDelaySeconds: 30
+
+# containerPort: 8080
+containerPort: 8443
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+hostnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: NodePort
+  port: 8080
+
+ingress:
+  enabled: true
+
+  annotations:
+    kubernetes.io/ingress.class: alb
+    # alb.ingress.kubernetes.io/inbound-cidrs: "0.0.0.0/0"
+    # alb.ingress.kubernetes.io/scheme: "internet-facing"
+    alb.ingress.kubernetes.io/inbound-cidrs: "10.0.0.0/8,172.16.0.0/12,192.168.0.0/16"
+    alb.ingress.kubernetes.io/subnets: subnet-12345
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/scheme: "internal"
+    ingress.kubernetes.io/rewrite-target: "/"
+  
+  useGeneratedHostname: true
+  #hosts:
+  #  - host: code-server.example.loc
+  #    paths:
+  #      - /
+
+  #tls:
+  #  - secretName: code-server
+  #    hosts:
+  #      - code-server.example.loc
+
+# Optional additional arguments
+extraArgs: []
+  # These are the arguments normally passed to code-server; run
+  # code-server --help for a list of available options.
+  #
+  # Each argument and parameter must have its own entry; if you use
+  # --param value on the command line, then enter it here as:
+  #
+  # - --param
+  # - value
+  #
+  # If you receive an error like "Unknown option --param value", it may be
+  # because both the parameter and value are specified as a single argument,
+  # rather than two separate arguments (e.g. "- --param value" on a line).
+
+# Optional additional environment variables
+extraVars: []
+#  - name: DISABLE_TELEMETRY
+#    value: true
+
+##
+## Init containers parameters:
+## volumePermissions: Change the owner of the persist volume mountpoint to RunAsUser:fsGroup
+##
+volumePermissions:
+  enabled: true
+  securityContext:
+    runAsUser: 0
+
+## Pod Security Context
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+##
+securityContext:
+  enabled: true
+  fsGroup: 1000
+  runAsUser: 1000
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 3
+    memory: 8Gi
+  requests:
+    cpu: 1
+    memory: 2Gi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## Persist data to a persistent volume
+persistence:
+  # enabled: false
+  enabled: true
+  ## code-server data Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  accessMode: ReadWriteOnce
+  size: 10Gi
+  annotations: {}
+  # existingClaim: ""
+  # hostPath: /data
+
+serviceAccount:
+  create: true
+  name:
+
+## Enable an Specify container in extraContainers.
+## This is meant to allow adding code-server dependencies, like docker-dind.
+extraContainers: |
+#- name: docker-dind
+#  image: docker:19.03-dind
+#  imagePullPolicy: IfNotPresent
+#  resources:
+#    requests:
+#      cpu: 250m
+#      memory: 256M
+#  securityContext:
+#    privileged: true
+#    procMount: Default
+#  env:
+#  - name: DOCKER_TLS_CERTDIR
+#    value: ""
+#  - name: DOCKER_DRIVER
+#    value: "overlay2"
+
+## Additional code-server secret mounts
+extraSecretMounts: []
+  # - name: secret-files
+  #   mountPath: /etc/secrets
+  #   secretName: code-server-secret-files
+  #   readOnly: true
+
+## Additional code-server volume mounts
+extraVolumeMounts: []
+  # - name: extra-volume
+  #   mountPath: /mnt/volume
+  #   readOnly: true
+  #   existingClaim: volume-claim
+  #   hostPath: ""
+
+extraConfigmapMounts: []
+  # - name: certs-configmap
+  #   mountPath: /etc/code-server/ssl/
+  #   subPath: certificates.crt # (optional)
+  #   configMap: certs-configmap
+  #   readOnly: true
