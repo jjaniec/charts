@@ -75,7 +75,11 @@ spec:
           - --upstream=http://localhost:{{ .Values.containerPort }}/
           - --http-address=0.0.0.0:{{ .Values.oauthProxy.containerPort }}
           - --authenticated-emails-file=/mnt/authenticated-emails.txt
+          {{- if .Values.ingress.pathPrefix }}
+          - --redirect-url=https://{{ include "code-server.domainName" . }}{{ .Values.ingress.pathPrefix }}/oauth2/callback
+          {{- else }}
           - --redirect-url=https://{{ include "code-server.domainName" . }}/oauth2/callback
+          {{- end }}
           - --pass-access-token=true
           - --pass-authorization-header=true
           - --skip-auth-regex=^\/config\.json$

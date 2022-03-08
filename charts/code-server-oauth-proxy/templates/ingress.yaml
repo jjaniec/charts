@@ -26,7 +26,11 @@ spec:
     - host: {{ include "code-server.domainName" . | quote }}
       http:
         paths:
-          - path: /
+          {{- if .Values.ingress.pathPrefix }}
+          - path: "{{ .Values.ingress.pathPrefix }}/"
+          {{- else }}
+          - path: "/"
+          {{- end }}
             pathType: Prefix
             backend:
               service:
