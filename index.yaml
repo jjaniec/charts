@@ -11,4 +11,14 @@ entries:
     urls:
     - https://github.com/jjaniec/charts/releases/download/code-server-oauth-proxy-1.0.0/code-server-oauth-proxy-1.0.0.tgz
     version: 1.0.0
-generated: "2022-03-08T09:39:50.115447599Z"
+  generic-cj-scaler:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-01-12T14:35:20.073841514Z"
+    description: Generic deployments/statefulsets scaler using cronjobs
+    digest: fc5bf99bf079e653bce338b64a7550aa538cc531d0ab9ae779e6d4a9df42d373
+    name: generic-cj-scaler
+    urls:
+    - https://github.com/jjaniec/charts/releases/download/generic-cj-scaler-1.0.0/generic-cj-scaler-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-01-12T14:35:20.073848527Z"
