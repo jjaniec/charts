@@ -1,0 +1,32 @@
+{{- range .Values.deployments }}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: scaling-deploy-{{ .name }}
+  namespace: {{ .namespace }}
+subjects:
+- kind: ServiceAccount
+  name: scaling-deploy-{{ .name }}
+  namespace: {{ .namespace }}
+roleRef:
+  kind: Role
+  name: scaling-deploy-{{ .name }}
+  apiGroup: ""
+{{- end }}
+{{- range .Values.statefulsets }}
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: scaling-sts-{{ .name }}
+  namespace: {{ .namespace }}
+subjects:
+- kind: ServiceAccount
+  name: scaling-sts-{{ .name }}
+  namespace: {{ .namespace }}
+roleRef:
+  kind: Role
+  name: scaling-sts-{{ .name }}
+  apiGroup: ""
+{{- end }}

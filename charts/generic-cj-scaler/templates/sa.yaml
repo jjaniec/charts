@@ -1,0 +1,16 @@
+{{- range .Values.deployments }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scaling-deploy-{{ .name }}
+  namespace: {{ .namespace }}
+{{- end }}
+{{- range .Values.statefulsets }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: scaling-sts-{{ .name }}
+  namespace: {{ .namespace }}
+{{- end }}

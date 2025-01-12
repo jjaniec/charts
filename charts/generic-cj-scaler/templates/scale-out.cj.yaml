@@ -1,0 +1,50 @@
+{{- range .Values.deployments }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ printf "scale-out-deploy-%s" .name | trunc 52 | trimSuffix "-" }}
+  namespace: {{ .namespace }}
+spec:
+  timeZone: {{ .timeZone | quote }}
+  schedule: {{ .scaleOutSchedule }}
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: scaling-deploy-{{ .name }}
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - kubectl scale deploy -n {{ .namespace }} {{ .name }} --replicas={{ .maxReplicas }}
+          restartPolicy: OnFailure
+{{- end }}
+{{- range .Values.statefulsets }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ printf "scale-out-sts-%s" .name | trunc 52 | trimSuffix "-" }}
+  namespace: {{ .namespace }}
+spec:
+  timeZone: {{ .timeZone | quote }}
+  schedule: {{ .scaleOutSchedule }}
+  successfulJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: scaling-sts-{{ .name }}
+          containers:
+          - name: kubectl
+            image: bitnami/kubectl:latest
+            command:
+            - /bin/sh
+            - -c
+            - kubectl scale sts -n {{ .namespace }} {{ .name }} --replicas={{ .maxReplicas }}
+          restartPolicy: OnFailure
+{{- end }}

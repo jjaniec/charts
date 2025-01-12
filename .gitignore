@@ -1,0 +1,11 @@
+### Helm ###
+# Chart dependencies
+**/charts/*.tgz
+
+# Chart local files
+**/Chart.lock
+
+# Decrypted helm-secret files
+**/*.yaml.dec
+
+**/*.bak

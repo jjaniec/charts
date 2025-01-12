@@ -1,0 +1,12 @@
+---
+timeZone: "Europe/Paris"
+
+deployments:
+  - namespace: default
+    name: gitlab-runners
+    minReplicas: 0
+    maxReplicas: 2
+    scaleInSchedule: "0 18 * * 1-5"
+    scaleOutSchedule: "0 9 * * 1-5"
+
+statefulsets: []
