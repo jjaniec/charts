@@ -1,0 +1,68 @@
+{{ range .Values.oauth2proxies }}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: oauth2-proxy-{{ .name }}
+  namespace: {{ if .namespaceOverride }}{{ .namespaceOverride }}{{ else }}{{if $.Values.globalSettings.namespaceOverride }}{{ $.Values.globalSettings.namespaceOverride }}{{ else }}{{ $.Release.Namespace }}{{ end }}{{ end }}
+spec:
+  interval: 10m
+  timeout: 5m
+  chart:
+    spec:
+      chart: oauth2-proxy
+      version: {{ if .helmChartVersion }}{{ .helmChartVersion }}{{ else }}{{ if $.Values.globalSettings.helmChartVersion }}{{ $.Values.globalSettings.helmChartVersion }}{{ else }}{{ fail "Either globalSettings.helmChartVersion or oauth2proxies[].helmChartVersion must be specified" }}{{ end }}{{ end }}
+      sourceRef:
+        kind: HelmRepository
+        name: oauth2-proxy
+        namespace: {{ $.Release.Namespace }}
+      interval: 10m
+  releaseName: oauth2-proxy-{{ .name }}
+  install:
+    # crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    # crds: CreateReplace
+    remediation:
+      retries: 3
+  values:
+    namespaceOverride: "{{ if .namespaceOverride }}{{ .namespaceOverride }}{{ else }}{{if $.Values.globalSettings.namespaceOverride }}{{ $.Values.globalSettings.namespaceOverride }}{{ else }}{{ $.Release.Namespace }}{{ end }}{{ end }}"
+    config:
+      clientID: {{ if .oauthConfig }}{{ .oauthConfig.clientID }}{{ else }}{{ if and ($.Values.globalSettings.oauthConfig) (not (eq $.Values.globalSettings.oauthConfig.clientID "")) }}{{ $.Values.globalSettings.oauthConfig.clientID }}{{ else }}{{ fail "Either globalSettings.oauthConfig.clientID or oauth2proxies[].oauthConfig.clientID must be specified" }}{{ end }}{{ end }}
+      clientSecret: {{ if .oauthConfig }}{{ .oauthConfig.clientSecret }}{{ else }}{{ if and ($.Values.globalSettings.oauthConfig) (not (eq $.Values.globalSettings.oauthConfig.clientSecret "")) }}{{ $.Values.globalSettings.oauthConfig.clientSecret }}{{ else }}{{ fail "Either globalSettings.oauthConfig.clientSecret or oauth2proxies[].oauthConfig.clientSecret must be specified" }}{{ end }}{{ end }}
+    extraArgs:
+      - --provider=oidc
+      - --http-address=0.0.0.0:4180
+      - --scope={{ if .scope }}{{ .scope }}{{ else }}{{ if $.Values.globalSettings.scope }}{{ $.Values.globalSettings.scope }}{{ else }}{{ fail "Either globalSettings.scope or oauth2proxies[].scope must be specified" }}{{ end }}{{ end }}
+      - --oidc-issuer-url={{ if .oidcIssuerUrl }}{{ .oidcIssuerUrl }}{{ else }}{{ if not (eq $.Values.globalSettings.oidcIssuerUrl "") }}{{ $.Values.globalSettings.oidcIssuerUrl }}{{ else }}{{ fail "Either globalSettings.oidcIssuerUrl or oauth2proxies[].oidcIssuerUrl must be specified" }}{{ end }}{{ end }}
+      - --redirect-url=https://{{ if .host }}{{ .host }}{{ else }}{{ if $.Values.globalSettings.baseHost }}{{ .name }}.{{ $.Values.globalSettings.baseHost }}{{ else }}{{ fail "Either globalSettings.baseHost or oauth2proxies[].host must be specified" }}{{ end }}{{ end }}/oauth2/callback
+      - --upstream=http://{{ required "oauth2proxies[].targetSvc must be set, format service.namespace:port_number" .targetSvc }}
+      {{ if .allowedGroups }}- --allowed-group={{ .allowedGroups }}{{ else }}{{ if $.Values.globalSettings.allowedGroups }}- --allowed-group={{ $.Values.globalSettings.allowedGroups }}{{ end }}{{ end }}
+      # - --authenticated-emails-file=/mnt/authenticated-emails.txt
+      - --set-authorization-header=true
+      - --pass-access-token=true
+      - --pass-authorization-header=true
+      - --cookie-refresh=2m
+      - --skip-provider-button
+      - --show-debug-on-error
+      - --skip-auth-regex=^\/config\.json$
+      - --skip-auth-regex=^\/manifest\.json$
+      - --skip-auth-regex=^\/custom_style\.css$
+      - --skip-auth-regex=^\/clr-ui.min\.css$
+      - --skip-auth-regex=^\/clr-ui-dark.min\.css$
+      - --skip-auth-regex=^\/custom_locale\.json$
+      - --skip-auth-regex=^\/favicon.*\.png$
+      - --skip-auth-regex=^\/favicon.*\.ico$
+      - --skip-auth-regex=^\/static\/
+    # podLabels: { app: oauth2-proxy-{{ .name }} }
+    ingress:
+      enabled: false
+{{- if .extraValues }}
+{{ toYaml .extraValues | indent 4 }}
+{{- else }}
+{{- if $.Values.globalSettings.extraValues }}
+{{ toYaml $.Values.globalSettings.extraValues | indent 4 }}
+{{- end }}
+{{- end }}
+{{ end }}

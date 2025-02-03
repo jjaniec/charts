@@ -1,0 +1,11 @@
+{{ if $.Values.oauth2proxies }}
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: oauth2-proxy
+  namespace: {{ $.Release.Namespace }}
+spec:
+  interval: 60m
+  url: https://oauth2-proxy.github.io/manifests
+{{ end }}

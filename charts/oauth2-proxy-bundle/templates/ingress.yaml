@@ -1,0 +1,32 @@
+{{- range .Values.oauth2proxies }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  {{- if hasKey $.Values.globalSettings "ingressAnnotations"  }}
+  annotations:
+{{ toYaml $.Values.globalSettings.ingressAnnotations | indent 4 }}
+  {{- end }}
+  labels:
+    app: {{ $.Release.Name }}
+    release: {{ $.Release.Name }}
+  name: oauth2-proxy-{{ .name }}
+  namespace: {{ if .namespaceOverride }}{{ .namespaceOverride }}{{ else }}{{if $.Values.globalSettings.namespaceOverride }}{{ $.Values.globalSettings.namespaceOverride }}{{ else }}{{ $.Release.Namespace }}{{ end }}{{ end }}
+spec:
+  ingressClassName: {{ if $.ingressClassName }}{{ $.ingressClassName }}{{ else }}{{ if $.Values.globalSettings.ingressClassName }}{{ $.Values.globalSettings.ingressClassName }}{{ else}}{{ fail "Either globalSettings.ingressClassName or oauth2proxies[].ingressClassName must be specified" }}{{ end }}{{ end }}
+  rules:
+    - host: {{ if .host }}{{ .host }}{{ else }}{{ if $.Values.globalSettings.baseHost }}{{ .name }}.{{ $.Values.globalSettings.baseHost }}{{ else }}{{ fail "Either globalSettings.baseHost or oauth2proxies[].host must be specified" }}{{ end }}{{ end }}
+      http:
+        paths:
+          - backend:
+              service:
+                name: oauth2-proxy-{{ .name }}
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+  tls:
+  - hosts:
+    - {{ if .host }}{{ .host }}{{ else }}{{ if $.Values.globalSettings.baseHost }}{{ .name }}.{{ $.Values.globalSettings.baseHost }}{{ else }}{{ fail "Either globalSettings.baseHost or oauth2proxies[].host must be specified" }}{{ end }}{{ end }}
+    secretName: oauth2-proxy-{{ .name }}-http-tls
+{{ end }}

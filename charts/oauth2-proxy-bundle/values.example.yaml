@@ -1,0 +1,37 @@
+---
+globalSettings:
+  namespaceOverride: tooling
+  oidcIssuerUrl: https://sso.company.xyz/application/o/oauth2-proxy-generic/
+  scope: "openid email groups"
+  allowedGroups: "developers"
+  oauthConfig:
+    clientID: "xxx"
+    clientSecret: "xxx"
+
+  baseHost: kube-internals.company.xyz
+  ingressClassName: "cilium"
+  ingressAnnotations:
+    cert-manager.io/cluster-issuer: cloudflare-prod
+
+  ## oauth2-proxy helm chart configuration
+  # Helm chart version of oauth2-proxy to use
+  helmChartVersion: '7.10.2'
+  # Extra values to pass to the oauth2-proxy helm release
+  extraValues:
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+    metrics:
+      enabled: true
+    resources:
+      limits:
+        cpu: 200m
+      requests:
+        cpu: 50m
+        memory: 100Mi
+
+oauth2proxies:
+- name: alloy
+  targetSvc: alloy.tooling:12345
+- name: hubble
+  targetSvc: hubble-ui.kube-system:80

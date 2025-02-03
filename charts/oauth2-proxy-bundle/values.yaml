@@ -1,0 +1,64 @@
+---
+globalSettings:
+  # (Required) OIDC issuer URL
+  # oidcIssuerUrl: https://sso.company.xyz/application/o/oauth2-proxy/
+  oidcIssuerUrl: ""
+  # Scope to request from OIDC provider
+  scope: "openid email groups"
+  # Groups to allow access to
+  allowedGroups: ""
+  # allowedGroups: "kube_developers"
+  # oauth client id and secret
+  oauthConfig:
+    clientID: ""
+    clientSecret: ""
+
+  # (Optional) Base host to use, if defined hosts will be generated as <name>.<baseHost>, if not defined, host must be defined explicitely in each oauth2proxy in the oauth2proxies[].host value
+  # The value can be overriden by each oauth2proxy in the oauth2proxies[].host value
+  baseHost: ""
+  # baseHost: kube-internals.company.xyz
+
+  # Ingress class to use
+  ingressClassName: ""
+  # ingressClassName: cilium
+  # Annotations to add to the ingress resources
+  ingressAnnotations: {}
+  # ingressAnnotations:
+  #   cert-manager.io/cluster-issuer: cloudflare-prod
+
+  # (Optional) Namespace to deploy oauth2-proxy and its ingress in, defaults to $.Release.Namespace
+  namespaceOverride: 
+  # namespaceOverride: tooling
+
+
+  ## oauth2-proxy helm chart configuration
+  # Helm chart version of oauth2-proxy to use
+  helmChartVersion: '7.10.2'
+  # Extra values to pass to the oauth2-proxy helm release
+  extraValues: {}
+  # extraValues:
+  #   autoscaling:
+  #     enabled: false
+  #     minReplicas: 1
+  #   metrics:
+  #     enabled: true
+  #   resources:
+  #     limits:
+  #       cpu: 200m
+  #     requests:
+  #       cpu: 50m
+  #       memory: 100Mi
+
+# List of oauth2proxies to deploy
+oauth2proxies: []
+# - name: service1
+#   targetSvc: service1.default:80
+#   # host is optional, if not defined, the host will be generated as <name>.<baseHost>, so the application will be available at service1.kube-internals.company.xyz in our example
+
+# - name: service2
+#   targetSvc: service2.namespace:12345
+#   host: service2.kube-internals.company.xyz
+#   allowedGroups: "kube_admin"
+#   oauthConfig:
+#     clientID: "xxx"
+#     clientSecret: "xxx"
