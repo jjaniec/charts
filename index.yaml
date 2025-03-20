@@ -21,4 +21,15 @@ entries:
     urls:
     - https://github.com/jjaniec/charts/releases/download/generic-cj-scaler-1.0.0/generic-cj-scaler-1.0.0.tgz
     version: 1.0.0
-generated: "2025-01-12T14:35:20.073848527Z"
+  oauth2-proxy-bundle:
+  - apiVersion: v2
+    appVersion: 1.0.0
+    created: "2025-03-20T16:40:03.500749931Z"
+    description: Bulk deploy multiple oauth2-proxy instances proxyfing traffic to
+      a given of kube services. Requires flux2's HelmRelease CRD
+    digest: a27dddafbdc286a8232ae3258d3f6e5927a36bc6dba6e32e2a1e91d29acacd5b
+    name: oauth2-proxy-bundle
+    urls:
+    - https://github.com/jjaniec/charts/releases/download/oauth2-proxy-bundle-1.0.0/oauth2-proxy-bundle-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-03-20T16:40:03.500761372Z"
